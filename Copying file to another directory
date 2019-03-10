@@ -1,0 +1,64 @@
+##Get sub-folder names:
+#check:
+from os import listdir
+from os.path import isdir, isfile, join
+mypath='data/Train/'
+onlyfiles = [f for f in listdir(mypath) if isdir(join(mypath, f))]
+onlyfiles = sorted(onlyfiles)
+# print(onlyfiles)
+print(onlyfiles[1])
+
+##Main codes:
+import csv
+import re
+import os
+from os import path
+import shutil
+
+def making_folder(folder_name):
+    try:  
+        os.mkdir(folder_name)
+    except OSError:  
+        print ("Creation of the directory %s failed" % path)
+    else:  
+        print ("Successfully created the directory %s " % path)
+
+## TSV file and folders names:
+all_folders = ['00', '0a', '0b', '0c', '0d', '0e', '0f', '01', '02', '03', '04', '05', '06', '07', '08', '09', '1a', '1b', '1c', '1d', '1e', '1f', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19']
+
+# all_folders = ['00', '0a']
+
+words = set()
+cnt = 0 ## ignore counting
+
+for folder_name in all_folders:
+    
+    with open('data/' + folder_name + '.tsv', encoding="utf8") as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter='\t')
+        for row in csv_reader:
+            text = row[2]
+            spk = row[1]
+            #regex check:(1)
+            l = len(text)
+            s = re.sub('[0-9]*', '', text) 
+            l1 = len(s)
+            if l != l1: ## mane ei row ignore korlam
+                cnt += 1
+                continue
+            text = re.sub('[\t\n,\)(!@$%^&*`~.?(\\\)]*', '', text)
+            #track unique words:(2)
+            a = text.split(" ")## all words
+            for val in a:
+                words.add(val)
+            #wav file copy:(3)
+            dst = 'data/Train/'+spk
+            src = 'data/'+folder_name+'/' # wav file location
+            f = row[0]+'.wav'
+            making_folder(dst)
+            p = path.join(src, f)
+            dp = dst + '/' + f
+            if os.path.exists(p) == True and os.path.exists(dp) == False:
+                shutil.copy(p, dst) # copy wav files in the specific spk files
+            
+print(len(words))
+print("ignore n(rows): ",cnt)
