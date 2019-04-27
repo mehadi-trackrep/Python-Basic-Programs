@@ -1,0 +1,35 @@
+import Levenshtein as Lev
+
+
+def wer(s1, s2):
+    # Computes the Word Error Rate, defined as the edit distance between the two provided sentences after tokenizing to words.
+
+    # build mapping of words to integers
+    b = set(s1.split() + s2.split())
+    word2char = dict(zip(b, range(len(b))))
+
+    # map the words to a char array (Levenshtein packages only accepts strings)
+    w1 = [chr(word2char[w]) for w in s1.split()]
+    w2 = [chr(word2char[w]) for w in s2.split()]
+
+    return Lev.distance(''.join(w1), ''.join(w2))
+
+
+def cer(s1, s2):
+    # Computes the Character Error Rate, defined as the edit distance.
+
+    s1, s2, = s1.replace(' ', ''), s2.replace(' ', '')
+    return Lev.distance(s1, s2)
+
+
+if __name__ == '__main__':
+    s1 = "আমার নাম mehadi"
+    s2 = "আমার নামে hasan"
+    # s1 = "আমার নাম মেহেদী"
+    # s2 = "আমার নামে মেহাদী"
+
+    # s1 = "mehadi"
+    # s2 = "hasan"
+
+    print("wer: ", wer(s1, s2))
+    print("cer: ", cer(s1, s2))
